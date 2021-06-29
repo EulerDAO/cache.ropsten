@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: data
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+
+      - run: git clone https://@github.com/eulerdao/contracts.git
+
+      - run: echo ${{ secrets.DEV_CONFIG }} | base64 -d > contracts/.dev.config.js
+      
+      - run: ln -s $(pwd) $(pwd)/contracts/.cache
+
+      - run: |
+          cd contracts
+          npm install
+          npx hardhat --network ropsten run scripts/CountProblems.js
+
+      - run: rm -rf contracts
+      
+      - run: |
+          git add .
+          git config --global user.email "eulerdao"
+          git config --global user.name "eulerdao"
+          git commit -m 'build cache'
+          git push
