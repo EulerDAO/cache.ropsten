@@ -34,5 +34,5 @@ jobs:
           git add .
           git config --global user.email "eulerdao"
           git config --global user.name "eulerdao"
-          git commit -m 'build cache'
+          git commit -m 'build cache' || true
           git push
